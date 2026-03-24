@@ -1,25 +1,12 @@
 <?php
-// Other PHP code above
+// Other parts of your PHP code
 
-function getBundles() {
-    // Other code...
-    $apiKey = getenv("TOPPILY_API_KEY"); // Changed from hardcoded key
-    // Other code...
-}
-
-function buyData($data) {
-    // Other code...
-    $apiKey = getenv("TOPPILY_API_KEY"); // Changed from hardcoded key
-    // Other code...
-}
-
-// Improved formatting for prices extraction in the foreach loop
+// Example of improved formatting for bundles
 foreach ($bundles as $bundle) {
-    echo "<div class='bundle'>";
-    echo "<h2>{$bundle['name']}</h2>";
-    echo "<p>Price: " . number_format($bundle['price'], 2) . "</p>";
-    echo "</div>";
+    echo "Bundle Name: " . $bundle['name'] . " - Price: " . number_format($bundle['selling_price'], 2) . "\n";
 }
 
-// Other PHP code below
-?>
+// Use getenv for API key assignments
+$apiKey = getenv("TOPPILY_API_KEY");
+
+// Other parts of your PHP code
