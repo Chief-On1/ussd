@@ -1,7 +1,5 @@
 <?php
 
-header('Content-Type: text/plain');
-
 // Get data from Africa's Talking
 $sessionId   = $_POST["sessionId"] ?? ''; 
 $serviceCode = $_POST["serviceCode"] ?? ''; 
@@ -219,4 +217,5 @@ function buyData($phone, $bundleId) {
 }
 
 // Output response
+header('Content-Type: text/plain');
 echo $response;
