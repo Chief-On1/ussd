@@ -1,10 +1,10 @@
 <?php
 
 // Get data from Africa's Talking
-$sessionId   = $_POST["sessionId"] ?? '';
-$serviceCode = $_POST["serviceCode"] ?? '';
-$phoneNumber = $_POST["phoneNumber"] ?? '';
-$text        = $_POST["text"] ?? '';
+$sessionId   = $_POST["sessionId"] ?? ''; 
+$serviceCode = $_POST["serviceCode"] ?? ''; 
+$phoneNumber = $_POST["phoneNumber"] ?? ''; 
+$text        = $_POST["text"] ?? ''; 
 
 // Split user input
 $input = explode("*", $text);
@@ -13,30 +13,30 @@ $input = explode("*", $text);
 $response = "";
 
 /*
-|--------------------------------------------------------------------------
-| USSD MENU LOGIC
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------|
+| USSD MENU LOGIC                                                  |
+|----------------------------------------------------------------------|
 */
 
 if ($text == "") {
 
-    // Main menu
-    $response  = "CON Welcome to IK_DIGITALS\n";
-    $response .= "1. Buy Data Bundles\n";
-    $response .= "2. Check Status\n";
-    $response .= "3. Contact Us";
+    // Main menu - Professional Greeting
+    $response  = "CON Welcome to IK Digitals Services\n";
+    $response .= "1. Purchase Data Bundles\n";
+    $response .= "2. Check Account Status\n";
+    $response .= "3. Contact Support";
 
 } elseif ($input[0] == "1") {
 
     // Step 1: Choose network
     if (!isset($input[1])) {
-        $response  = "CON Choose Network\n";
+        $response  = "CON Please Select Your Network Provider\n";
         $response .= "1. MTN\n";
         $response .= "2. Telecel\n";
         $response .= "3. AirtelTigo";
     }
 
-    // Step 2: Show bundles (THIS is where Toppily API comes in)
+    // Step 2: Show bundles
     elseif (isset($input[1]) && !isset($input[2])) {
 
     $network = $input[1];
@@ -46,41 +46,42 @@ if ($text == "") {
         case "2": $networkName = "Telecel"; break;
         case "3": $networkName = "AirtelTigo"; break;
         default:
-            echo "END Invalid option";
+            echo "END Invalid option selected";
             exit;
     }
 
     $bundles = getBundles($networkName);
 
     if (empty($bundles)) {
-        $response = "END No bundles available";
+        $response = "END No data bundles are currently available. Please try again later.";
     } else {
-        $response = "CON Select Bundle\n";
+        $response = "CON Please Select a Data Bundle\n";
 
         foreach ($bundles as $index => $bundle) {
             $num = $index + 1;
-            $response .= "$num. {$bundle['name']} - GHS {$bundle['selling_price']}\n";
+            $response .= "$num. {
+                $bundle['name']} - GHS {
+                $bundle['selling_price']}\n";
         }
-
-        // Save bundles in session (IMPORTANT)
-        session_start();
-        $_SESSION['bundles'] = $bundles;
     }
 }
 
     // Step 3: Confirm purchase
     elseif (isset($input[2])) {
 
-    session_start();
-
     $bundleIndex = (int)$input[2] - 1;
+    
+    // Get bundles again to verify selection
+    $networkMap = ["1" => "MTN", "2" => "Telecel", "3" => "AirtelTigo"];
+    $networkName = $networkMap[$input[1]] ?? "MTN";
+    $bundles = getBundles($networkName);
 
-    if (!isset($_SESSION['bundles'][$bundleIndex])) {
-        echo "END Invalid bundle selection";
+    if (!isset($bundles[$bundleIndex])) {
+        echo "END Invalid bundle selection. Please try again.";
         exit;
     }
 
-    $selectedBundle = $_SESSION['bundles'][$bundleIndex];
+    $selectedBundle = $bundles[$bundleIndex];
 
     // ✅ SELLING PRICE (what user should pay)
     $userPrice = $selectedBundle['selling_price'];
@@ -99,40 +100,40 @@ if ($text == "") {
 
         $profit = $userPrice - $actualPrice;
 
-        $response = "END Success!\n";
-        $response .= "Data sent.\n";
-        $response .= "You paid: GHS $userPrice";
+        $response = "END Transaction Successful!\n";
+        $response .= "Data bundle activated.\n";
+        $response .= "Amount: GHS " . number_format($userPrice, 2);
 
         // 🔥 You can log profit here (VERY IMPORTANT)
         // saveTransaction($phoneNumber, $actualPrice, $userPrice, $profit);
 
     } else {
-        $response = "END Failed. Try again later.";
+        $response = "END Transaction failed. Please try again or contact support.";
     }
 }
 
 } elseif ($input[0] == "2") {
 
-    $response = "END Your number is $phoneNumber";
+    $response = "END Account Status\nPhone: $phoneNumber\nFor more details, contact our support team.";
 
 } elseif ($input[0] == "3") {
 
-    $response = "END Contact: O257906577 for more info";
+    $response = "END Support Contact\nPhone: +233 257 906 577\nEmail: support@ikdigitals.com";
 
 } else {
 
-    $response = "END Invalid option";
+    $response = "END Invalid option selected. Please start over.";
 }
 
 /*
-|--------------------------------------------------------------------------
-| FUNCTION TO GET BUNDLES (MOCK FOR NOW)
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------|
+| FUNCTION TO GET BUNDLES                                             |
+|----------------------------------------------------------------------|
 */
 
 function getBundles($network) {
 
-    $apiKey = "YOUR_NEW_API_KEY";
+    $apiKey = "dk_m7NNlH3qkEUyjgeFnyjrYJDf2vXThj3u";
 
     $networkMap = [
         "MTN" => "MTN",
@@ -214,6 +215,7 @@ function buyData($phone, $bundleId) {
 
     return json_decode($result, true);
 }
+
 // Output response
 header('Content-type: text/plain');
 echo $response;
