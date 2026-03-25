@@ -40,7 +40,7 @@ if ($text == "") {
 
     // STEP 1: HANDLE WARNING RESPONSE
     elseif ($input[1] == "2") {
-        $response = "END Transaction cancelled.";
+        $response = "END Thanks for visiting!\n\nYou can visit our website for more: https://ikdigitals.tplstores.com";
     }
 
     // STEP 2: SELECT NETWORK
@@ -111,7 +111,8 @@ if ($text == "") {
         } else {
             $response = "END Failed. Try again.";
         }
-    } elseif ($input[0] == "2") {
+    } 
+} elseif ($input[0] == "2") {
 
     $response = 'END Kindly visit https://ikdigitals.tplstores.com, at the top left conner, click on "Track order".\n Select purchased date and input the phone number.';
 
