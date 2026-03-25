@@ -1,5 +1,7 @@
 <?php
 
+header('Content-Type: text/plain');
+
 // Get data from Africa's Talking
 $sessionId   = $_POST["sessionId"] ?? ''; 
 $serviceCode = $_POST["serviceCode"] ?? ''; 
@@ -91,9 +93,9 @@ if ($text == "") {
 
         // 🔥 (Later: Add MoMo payment here)
 
-        $result = buyData($phoneNumber, $selectedBundle['id']);
-
-        if ($result && isset($result['status']) && $result['status'] == "success") {
+        $result = buyData($phoneNumber, $selectedBundle);
+        
+        if if ($result && isset($result['success']) && $result['success'] === true) {
 
             $profit = $userPrice - $actualPrice;
 
@@ -179,16 +181,12 @@ function getBundles($network) {
 |--------------------------------------------------------------------------
 */
 
-function buyData($phone, $bundleId) {
-
-    $apiKey = getenv("TOPPILY_API_KEY");
 function buyData($phone, $bundle) {
 
     $apiKey = getenv("TOPPILY_API_KEY");
 
     $url = "https://agent.toppily.com/api/v1/buy-data-package";
 
-    // Generate unique reference
     $reference = "txn_" . time();
 
     $payload = [
@@ -217,7 +215,6 @@ function buyData($phone, $bundle) {
     return json_decode($result, true);
 }
 
-
     // Helper functions
 function getNetworkId($name) {
     if (stripos($name, "MTN") !== false) return 1;
@@ -232,5 +229,4 @@ function extractVolume($name) {
 }
 
 // Output response
-header('Content-Type: text/plain');
 echo $response;
