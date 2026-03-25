@@ -137,7 +137,7 @@ function getBundles($network) {
 
     $network_id = $networkMap[$network] ?? "MTN";
 
-    $url = "https://agent.toppily.com/api/v1/data/types";
+    $url = "https://agent.toppily.com/api/v1/fetch-data-packages";
 
     $ch = curl_init();
 
