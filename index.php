@@ -22,7 +22,7 @@ $response = "";
 
 if ($text == "") {
 
-    $response  = "CON Welcome to IK Digitals Services\n";
+    $response  = "CON Welcome to IK Digitals Services\n\n";
     $response .= "1. Purchase Data Bundles\n";
     $response .= "2. Check Account Status\n";
     $response .= "3. Contact Support";
@@ -31,7 +31,7 @@ if ($text == "") {
 
     // Step 1: Choose network
     if (!isset($input[1])) {
-        $response  = "CON Please Select Your Network Provider\n";
+        $response  = "CON Please Select Your Network Provider\n\n";
         $response .= "1. MTN\n";
         $response .= "2. Telecel\n";
         $response .= "3. AirtelTigo";
@@ -56,7 +56,7 @@ if ($text == "") {
         if (empty($bundles)) {
             $response = "END No data bundles available.";
         } else {
-            $response = "CON Select a Data Bundle\n";
+            $response = "CON Select a Data Bundle\n\n";
 
             foreach ($bundles as $index => $bundle) {
                 $num = $index + 1;
