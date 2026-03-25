@@ -126,10 +126,9 @@ if ($text == "") {
 | FETCH DATA BUNDLES
 |--------------------------------------------------------------------------
 */
-
 function getBundles($network) {
 
-    $apiKey = getenv("TOPPILY_API_KEY");
+    $apiKey = "dk_m7NNlH3qkEUyjgeFnyjrYJDf2vXThj3u";
 
     $url = "https://agent.toppily.com/api/v1/fetch-data-packages";
 
@@ -149,26 +148,35 @@ function getBundles($network) {
 
     $response = json_decode($result, true);
 
+    if (!$response || !is_array($response)) {
+        return [];
+    }
+
+    $networkMap = [
+        "MTN" => "MTN",
+        "Telecel" => "VODAFONE",
+        "AirtelTigo" => "AIRTELTIGO"
+    ];
+
+    $selectedNetwork = $networkMap[$network] ?? "MTN";
+
     $bundles = [];
 
-    if (is_array($response)) {
+    foreach ($response as $item) {
 
-        foreach ($response as $item) {
+        if ($item['status'] !== "In Stock") continue;
 
-            if (strtoupper($item['network']) == strtoupper($network)) {
+        if (strtoupper($item['network']) == $selectedNetwork) {
 
-                $actualPrice = (float)$item['console_price'];
+            $actualPrice = (float)$item['console_price'];
+            $sellingPrice = $actualPrice * 1.20;
 
-                // ✅ Add 20% profit
-                $sellingPrice = $actualPrice * 1.20;
-
-                $bundles[] = [
-                    "id" => $item['id'],
-                    "name" => $item['name'],
-                    "actual_price" => $actualPrice,
-                    "selling_price" => round($sellingPrice, 2)
-                ];
-            }
+            $bundles[] = [
+                "id" => $item['id'],
+                "name" => $item['name'],
+                "actual_price" => $actualPrice,
+                "selling_price" => round($sellingPrice, 2)
+            ];
         }
     }
 
