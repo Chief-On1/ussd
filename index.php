@@ -112,7 +112,7 @@ if ($text == "") {
 
 } elseif ($input[0] == "3") {
 
-    $response = "END Call: +233257906577";
+    $response = "END WhatsApp/Call: +233257906577\nEmail: ikdennisisgreat@gmail.com";
 
 } else {
 
@@ -129,14 +129,6 @@ function getBundles($network) {
 
     $apiKey = getenv("TOPPILY_API_KEY");
 
-    $networkMap = [
-        "MTN" => "MTN",
-        "Telecel" => "VODAFONE",
-        "AirtelTigo" => "AIRTELTIGO"
-    ];
-
-    $network_id = $networkMap[$network] ?? "MTN";
-
     $url = "https://agent.toppily.com/api/v1/fetch-data-packages";
 
     $ch = curl_init();
@@ -145,8 +137,8 @@ function getBundles($network) {
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer $apiKey",
-            "Content-Type: application/json"
+            "api-key: $apiKey",
+            "Accept: application/json"
         ]
     ]);
 
@@ -157,14 +149,15 @@ function getBundles($network) {
 
     $bundles = [];
 
-    if (isset($response['data'])) {
-        foreach ($response['data'] as $item) {
+    if (is_array($response)) {
 
-            if (strtoupper($item['network']) == $network_id) {
+        foreach ($response as $item) {
 
-                $actualPrice = (float)$item['price'];
+            if (strtoupper($item['network']) == strtoupper($network)) {
 
-                // ✅ 20% PROFIT
+                $actualPrice = (float)$item['console_price'];
+
+                // ✅ Add 20% profit
                 $sellingPrice = $actualPrice * 1.20;
 
                 $bundles[] = [
@@ -189,12 +182,20 @@ function getBundles($network) {
 function buyData($phone, $bundleId) {
 
     $apiKey = getenv("TOPPILY_API_KEY");
+function buyData($phone, $bundle) {
 
-    $url = "https://agent.toppily.com/api/v1/data";
+    $apiKey = getenv("TOPPILY_API_KEY");
+
+    $url = "https://agent.toppily.com/api/v1/buy-data-package";
+
+    // Generate unique reference
+    $reference = "txn_" . time();
 
     $payload = [
-        "phone" => $phone,
-        "plan_id" => $bundleId
+        "recipient_msisdn" => $phone,
+        "network_id" => getNetworkId($bundle['name']),
+        "shared_bundle" => extractVolume($bundle['name']),
+        "incoming_api_ref" => $reference
     ];
 
     $ch = curl_init();
@@ -205,7 +206,7 @@ function buyData($phone, $bundleId) {
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($payload),
         CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer $apiKey",
+            "api-key: $apiKey",
             "Content-Type: application/json"
         ]
     ]);
@@ -214,6 +215,20 @@ function buyData($phone, $bundleId) {
     curl_close($ch);
 
     return json_decode($result, true);
+}
+
+
+    // Helper functions
+function getNetworkId($name) {
+    if (stripos($name, "MTN") !== false) return 1;
+    if (stripos($name, "Vodafone") !== false) return 2;
+    if (stripos($name, "Airtel") !== false) return 3;
+    return 1;
+}
+
+function extractVolume($name) {
+    preg_match('/(\d+)/', $name, $matches);
+    return isset($matches[1]) ? (int)$matches[1] * 1024 : 1024;
 }
 
 // Output response
