@@ -95,7 +95,7 @@ if ($text == "") {
 
         $result = buyData($phoneNumber, $selectedBundle);
         
-        if if ($result && isset($result['success']) && $result['success'] === true) {
+        if ($result && isset($result['success']) && $result['success'] === true) {
 
             $profit = $userPrice - $actualPrice;
 
